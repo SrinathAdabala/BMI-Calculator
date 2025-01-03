@@ -80,3 +80,88 @@ function calculateBMI() {
 
     recommendationsDiv.innerHTML = "<h3>Recommendations:</h3><ul>" + recommendations.map(rec => `<li><a href="https://www.perplexity.ai/?q=${encodeURIComponent(rec)}" target="_blank">${rec}</a></li>`).join("") + "</ul>";
 }
+
+
+// Function to save data to local storage
+function saveData(profileName, weightData) {
+    localStorage.setItem(profileName, JSON.stringify(weightData));
+}
+
+// Function to load data from local storage
+function loadData(profileName) {
+    const storedData = localStorage.getItem(profileName);
+    return storedData ? JSON.parse(storedData) : null;
+}
+
+// Function to download data as a JSON file
+function downloadData(profileName, format = "json") { // Added format parameter
+    const data = loadData(profileName);
+    if (data) {
+        let fileContent;
+        let fileType;
+        let fileName;
+
+        if (format === "json") {
+            fileContent = JSON.stringify(data, null, 2);
+            fileType = 'application/json';
+            fileName = `${profileName}_weights.json`;
+        } else if (format === "csv") { // CSV format
+            const header = "Date,Weight,Height\n"; // CSV header
+            const rows = data.map(item => `${item.date},${item.weight},${item.height}`).join('\n');
+            fileContent = header + rows;
+            fileType = 'text/csv';
+            fileName = `${profileName}_weights.csv`;
+        } else if (format === "txt") { // Text format
+            let textContent = `Weight Data for ${profileName}:\n`;
+            data.forEach(item => {
+                textContent += `Date: ${item.date}, Weight: ${item.weight}kg, Height: ${item.height}cm\n`;
+            });
+            fileContent = textContent;
+            fileType = 'text/plain';
+            fileName = `${profileName}_weights.txt`;
+        }
+        else {
+            alert("Invalid download format.");
+            return;
+        }
+
+        const blob = new Blob([fileContent], { type: fileType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(url);
+    } else {
+        alert("No data found for this profile.");
+    }
+}
+
+// Add event listener to the "Save Data" button
+document.getElementById('save-data').addEventListener('click', () => {
+    const profileName = prompt("Enter a profile name:");
+    if (profileName) {
+        const weight = parseFloat(document.getElementById('weight').value);
+        const heightCm = parseFloat(document.getElementById('height-cm').value);
+        if (isNaN(weight) || isNaN(heightCm) || weight <= 0 || heightCm <= 0) {
+            alert("Please calculate BMI first and enter valid weight and height.");
+            return;
+        }
+
+        let existingData = loadData(profileName) || [];
+        const date = new Date().toLocaleDateString();
+        existingData.push({ date: date, weight: weight, height: heightCm });
+
+        saveData(profileName, existingData);
+        alert(`Data saved for profile: ${profileName}`);
+    }
+});
+
+// Add event listener to the "Download Data" button
+document.getElementById('download-data').addEventListener('click', () => {
+    const profileName = prompt("Enter the profile name to download:");
+    if (profileName) {
+        const format = prompt("Enter the download format (json, csv, txt):").toLowerCase(); // Get format
+        downloadData(profileName, format); // Call downloadData with format
+    }
+});
