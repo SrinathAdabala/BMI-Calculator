@@ -124,3 +124,46 @@ input[type="number"], input[type="text"]{
     transition: background-color 0.3s;
     margin-top: 10px;
 }
+
+
+.data-management {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px; /* Add some space above the buttons */
+    flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+    gap: 10px; /* Add gap between buttons */
+}
+
+.data-management button {
+    padding: 10px 15px; /* Adjust padding as needed */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #007bff; /* Blue button */
+    color: white;
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+    flex-grow: 1; /* Distribute available space evenly */
+    min-width: 120px; /* Minimum width for buttons */
+    box-sizing: border-box;
+}
+
+.data-management button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+.data-management button:active {
+    background-color: #004085; /* Even darker blue on click */
+    transform: scale(0.98); /* Slightly scale down on click */
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 400px) {
+    .data-management {
+        flex-direction: column; /* Stack buttons vertically */
+        align-items: center; /* Center buttons */
+    }
+    .data-management button {
+        width: 100%; /* Full width buttons */
+        margin-bottom: 10px;
+    }
+}
